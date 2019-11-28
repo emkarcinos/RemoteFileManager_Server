@@ -1,10 +1,11 @@
-#pragma once
-
 #include "tcp_sock.h"
 
 #include <netinet/in.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+struct sockaddr_in socketAddr;
+int sockfd;
 
 int bindSocket(int port) {
     sockfd = socket(PF_INET, SOCK_STREAM, 0);
