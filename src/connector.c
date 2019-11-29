@@ -9,7 +9,7 @@
 #include "connector.h"
 
 
-int getTcpEndpoint(int sock, struct sockaddr_in *endpointAddr) {
+int getTcpEndpoint(const int sock, struct sockaddr_in *endpointAddr) {
     int endpoint;
     socklen_t len = sizeof(struct sockaddr_in);
     log_info("Waiting for connection...");

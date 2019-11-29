@@ -6,7 +6,7 @@
 #include "log.h"
 struct sockaddr_in socketAddr;
 
-int bindSocket(int port) {
+int bindSocket(const int port) {
     log_info("Starting server on port %d");
     log_info("Creating socket...");
     int sockfd = socket(PF_INET, SOCK_STREAM, 0);
