@@ -6,6 +6,10 @@
 #define C_DIR   "39235sendmedir"
 /* Asks for a file number */
 #define C_FILE  "62384filenumber"
+/* Yes */
+#define C_YES   "12385yesans"
+/* No */
+#define C_NO    "98632noans"
 /* Tells goodbye */
 #define C_STOP  "34569goodbye"
 
