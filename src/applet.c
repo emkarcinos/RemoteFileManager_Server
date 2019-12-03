@@ -44,7 +44,13 @@ void appLoop(const int sockfd){
             running = 0;
         } else if (response == C_FILE){
             char* msg = getMessage(sockfd);
-            sendFile(getFilePtrFromDir((const struct File_d **) directory, atoi(msg)), sockfd);
+            FILE* filePtr=getFilePtrFromDir((const struct File_d **) directory, atoi(msg));
+            sendFileSize(sockfd, filePtr);
+            response = getMessage(sockfd);
+            if(response == C_NO)
+                continue;
+            else if (response == C_YES)
+                sendFile(filePtr, sockfd);
         } else if (response == C_DIR) {
             sendDirectory(sockfd, (const struct File_d **) directory);
         }
