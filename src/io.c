@@ -2,6 +2,7 @@
 
 #include <sys/socket.h>
 #include <string.h>
+#include <arpa/inet.h>
 #include "io.h"
 #include "log.h"
 #include "protocol.h"
@@ -47,6 +48,14 @@ int sendFile(FILE *filePointer, const int socket) {
     }
     sendMessage(socket, FILE_DONE);
     return 0;
+}
+
+void sendFileSize(const int sockfd, FILE* filePtr){
+    long size = getFileSize(filePtr);
+    long converted = htonl(size);
+    char message[8];
+    memcpy(message, &converted, 8);
+    sendMessage(sockfd, message);
 }
 
 void sendDirectory(const int sockfd, const struct File_d** dirTable){

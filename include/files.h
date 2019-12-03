@@ -10,4 +10,6 @@ struct File_d {
 
 struct File_d** getDirectory(const char* path);
 
+long getFileSize(FILE* filePtr);
+
 FILE* getFilePtrFromDir(const struct File_d** dir, unsigned short num);

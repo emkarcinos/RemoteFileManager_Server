@@ -23,6 +23,11 @@ struct File_d** getDirectory(const char *path) {
     return dirTable;
 }
 
+long getFileSize(FILE* filePtr) {
+    fseek(filePtr, 0L, SEEK_END);
+    return ftell(filePtr);
+}
+
 FILE* getFilePtrFromDir(const struct File_d** dir, const unsigned short num){
     FILE* ptr = malloc(sizeof(FILE));
     ptr = fopen(dir[num-1]->name, "1");
