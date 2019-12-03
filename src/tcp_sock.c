@@ -1,9 +1,9 @@
 #include "tcp_sock.h"
 
 #include <netinet/in.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include "log.h"
+
 struct sockaddr_in socketAddr;
 
 int bindSocket(const int port) {
