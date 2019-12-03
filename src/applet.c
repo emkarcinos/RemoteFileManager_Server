@@ -20,19 +20,18 @@ void serveConnections(const int sockfd, const int flag) {
             log_info("Created child process (PID: %d) for a connection with %s.", child_pid,
                      inet_ntoa(endpointAddr.sin_addr));
         } else if (child_pid == 0) {/* child process */
-            appLoop(sockfd);
+            appLoop(nextsock);
         } else
             log_error("An attempt to create child process has failed.");
     } else {
         log_info("Serving a single connection");
-        char *message = getMessage(nextsock);
-        printf("%s\n", message);
+        appLoop(nextsock);
     }
 }
 
 void appLoop(const int sockfd){
     /* Welcome message */
-    sendMessage(sockfd, "Welcome to the file server. We're here to serve you.");
+    sendMessage(sockfd, "Welcome to the file server. We're here to serve you.\n");
     struct File_d** directory = getDirectory("/home/marcin/Downloads");
     int running = 1;
     while(running){

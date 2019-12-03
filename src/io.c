@@ -19,10 +19,10 @@ char *getMessage(const int socket) {
     return msg;
 }
 
-int sendMessage(const int socket, const char *message) {
+int sendMessage(int socket, const char *message) {
     log_info("Sending a message...");
-    int receivedBytes = send(socket, message, BUF_SIZE, 0);
-    if (receivedBytes < 0)
+    int receivedBytes = send(socket, message, 1024, 0);
+    if (receivedBytes <= 0)
         log_error("An error has occurred during sending.");
     else
         log_info("Message sent.");
