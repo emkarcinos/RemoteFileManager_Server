@@ -28,8 +28,10 @@ long getFileSize(FILE* filePtr) {
     return ftell(filePtr);
 }
 
-FILE* getFilePtrFromDir(const struct File_d** dir, const unsigned short num){
-    FILE* ptr = malloc(sizeof(FILE));
-    ptr = fopen(dir[num-1]->name, "1");
+FILE* getFilePtrFromDir(const struct File_d** dir, const unsigned int num){
+    char* path = malloc(sizeof(char)*BUF_SIZE);
+    memset(path, 0, BUF_SIZE);
+    sprintf(path, "/home/marcin/Downloads/%s", dir[num-1]->name);
+    FILE* ptr = fopen(path, "r");
     return ptr;
 }

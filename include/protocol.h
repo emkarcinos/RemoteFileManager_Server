@@ -2,6 +2,8 @@
 
 /* CLIENT MESSAGES */
 
+/* Allows for data transfer */
+#define C_ACK   "33986ack"
 /* Asks for directory list */
 #define C_DIR   "39235sendmedir"
 /* Asks for a file number */

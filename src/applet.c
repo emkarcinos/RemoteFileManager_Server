@@ -4,6 +4,7 @@
 #include <connector.h>
 #include <unistd.h>
 #include <arpa/inet.h>
+#include <string.h>
 #include <stdlib.h>
 #include "applet.h"
 #include "log.h"
@@ -35,22 +36,22 @@ void appLoop(const int sockfd){
     struct File_d** directory = getDirectory("/home/marcin/Downloads");
     int running = 1;
     while(running){
-        sendMessage(sockfd, "Choose a file from the list to download:");
+        sendMessage(sockfd, "Choose a file from the list to download:\n");
         sendDirectory(sockfd, (const struct File_d **) directory);
         char* response = getMessage(sockfd);
-        if (response == C_STOP){
+        if (strcmp(response, C_STOP) == 0){
             sendMessage(sockfd, "Goodbye.");
             running = 0;
-        } else if (response == C_FILE){
+        } else if (strcmp(response, C_FILE)==0){
             char* msg = getMessage(sockfd);
             FILE* filePtr=getFilePtrFromDir((const struct File_d **) directory, atoi(msg));
             sendFileSize(sockfd, filePtr);
             response = getMessage(sockfd);
-            if(response == C_NO)
+            if(strcmp(response, C_NO)==0)
                 continue;
-            else if (response == C_YES)
+            else if (strcmp(response, C_YES)==0)
                 sendFile(filePtr, sockfd);
-        } else if (response == C_DIR) {
+        } else if (strcmp(response, C_DIR)==0) {
             sendDirectory(sockfd, (const struct File_d **) directory);
         }
     }

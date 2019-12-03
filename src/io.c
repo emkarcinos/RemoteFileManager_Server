@@ -20,13 +20,18 @@ char *getMessage(const int socket) {
 }
 
 int sendMessage(int socket, const char *message) {
-    log_info("Sending a message...");
-    int receivedBytes = send(socket, message, 1024, 0);
-    if (receivedBytes <= 0)
-        log_error("An error has occurred during sending.");
-    else
-        log_info("Message sent.");
-    return receivedBytes;
+    char* temp = getMessage(socket);
+    if(strcmp(temp, C_ACK)==0){
+        log_info("Sending a message...");
+        int receivedBytes = send(socket, message, 1024, 0);
+        if (receivedBytes <= 0)
+            log_error("An error has occurred during sending.");
+        else
+            log_info("Message sent.");
+        return receivedBytes;
+    } else {
+        return -1;
+    }
 }
 
 int sendFile(FILE *filePointer, const int socket) {
@@ -61,9 +66,10 @@ void sendFileSize(const int sockfd, FILE* filePtr){
 void sendDirectory(const int sockfd, const struct File_d** dirTable){
     sendMessage(sockfd, DIR_START);
     char buffer[BUF_SIZE];
+    memset(buffer, 0, BUF_SIZE);
     for(int i = 0; dirTable[i] != NULL; i++) {
         sprintf(buffer, "%d: %s\n", dirTable[i]->id, dirTable[i]->name);
         sendMessage(sockfd, buffer);
     }
-    sendMessage(sockfd, DIR_DONE);
+    sendMessage(sockfd, DIR_DONE "\n");
 }
