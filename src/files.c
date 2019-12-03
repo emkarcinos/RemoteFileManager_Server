@@ -5,19 +5,26 @@
 #include <dirent.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
-char** getDirectory(const char *path) {
-    char** dirTable = malloc(sizeof(char*)*BUF_SIZE);
+struct File_d** getDirectory(const char *path) {
+    struct File_d** dirTable = malloc(sizeof(struct File_d*)*BUF_SIZE);
     DIR *dir;
     struct dirent *ent;
     if ((dir = opendir(path)) != NULL) {
         int num = 0;
         while ((ent = readdir(dir)) != NULL) {
-            dirTable[num] = malloc(sizeof(char)*BUF_SIZE);
-            sprintf(dirTable[num], "%d: %s", num+1, ent->d_name);
+            dirTable[num] = malloc(sizeof(struct File_d));
+            dirTable[num]->id=num + 1;
+            memcpy(dirTable[num]->name, ent->d_name, strlen(ent->d_name));
             num++;
         }
         closedir(dir);
     }
     return dirTable;
+}
+
+FILE* getFilePtrFromDir(const char** dir, const unsigned short num){
+    FILE* ptr = malloc(sizeof(FILE));
+
 }

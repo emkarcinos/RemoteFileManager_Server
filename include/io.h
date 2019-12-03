@@ -2,7 +2,7 @@
 
 #include <stdio.h>
 
-#define BUF_SIZE 2048
+#include "files.h"
 
 char *getMessage(int socket);
 
@@ -10,4 +10,4 @@ int sendMessage(int socket, const char *message);
 
 int sendFile(FILE *filePointer, int socket);
 
-void sendDirectory(int sockfd, const char** dirTable);
+void sendDirectory(int sockfd, const struct File_d** dirTable);

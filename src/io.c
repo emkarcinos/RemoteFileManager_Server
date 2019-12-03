@@ -45,7 +45,10 @@ int sendFile(FILE *filePointer, const int socket) {
     return 0;
 }
 
-void sendDirectory(const int sockfd, const char** dirTable){
-    for(int i = 0; dirTable[i]!=0; i++)
-        sendMessage(sockfd, dirTable[i]);
+void sendDirectory(const int sockfd, const struct File_d** dirTable){
+    char buffer[BUF_SIZE];
+    for(int i = 0; dirTable[i] != NULL; i++) {
+        sprintf(buffer, "%d: %s\n", dirTable[i]->id, dirTable[i]->name);
+    }
+    sendMessage(sockfd, buffer);
 }
