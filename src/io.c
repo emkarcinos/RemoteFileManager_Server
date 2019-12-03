@@ -4,6 +4,7 @@
 #include <string.h>
 #include "io.h"
 #include "log.h"
+#include "protocol.h"
 
 char *getMessage(const int socket) {
     static char msg[BUF_SIZE];
@@ -28,11 +29,13 @@ int sendMessage(const int socket, const char *message) {
 }
 
 int sendFile(FILE *filePointer, const int socket) {
+    sendMessage(socket, FILE_START);
     char buffer[BUF_SIZE];
     memset(buffer, 0, BUF_SIZE * sizeof(char));
     int readBytes;
     while ((readBytes = fread(buffer, sizeof(char), BUF_SIZE, filePointer)) > 0) {
         if (ferror(filePointer)) {
+            sendMessage(socket, FILE_ERR);
             log_error("Error opening the file.");
             return -1;
         }
@@ -42,13 +45,16 @@ int sendFile(FILE *filePointer, const int socket) {
         }
         memset(buffer, 0, BUF_SIZE * sizeof(char));
     }
+    sendMessage(socket, FILE_DONE);
     return 0;
 }
 
 void sendDirectory(const int sockfd, const struct File_d** dirTable){
+    sendMessage(sockfd, DIR_START);
     char buffer[BUF_SIZE];
     for(int i = 0; dirTable[i] != NULL; i++) {
         sprintf(buffer, "%d: %s\n", dirTable[i]->id, dirTable[i]->name);
+        sendMessage(sockfd, buffer);
     }
-    sendMessage(sockfd, buffer);
+    sendMessage(sockfd, DIR_DONE);
 }
