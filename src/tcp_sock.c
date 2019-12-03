@@ -3,7 +3,7 @@
 #include <netinet/in.h>
 #include <stdlib.h>
 #include "log.h"
-
+#include "settings.h"
 struct sockaddr_in socketAddr;
 
 int bindSocket(const int port) {

@@ -7,9 +7,12 @@
 #include "applet.h"
 #include "log.h"
 #include "io.h"
+#include "files.h"
 
 void serveConnections(const int sockfd, const int flag) {
     struct sockaddr_in endpointAddr;
+    struct File_d** dir = getDirectory("/home/marcin/Documents");
+    sendDirectory(sockfd, (const struct File_d **) dir);
     int nextsock = getTcpEndpoint(sockfd, &endpointAddr);
     if (flag == 1) {
         log_info("Serving connections in parallel");
