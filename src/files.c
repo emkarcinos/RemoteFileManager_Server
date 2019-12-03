@@ -1,7 +1,6 @@
 #pragma once
 
 #include "files.h"
-#include "io.h"
 #include <dirent.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -24,7 +23,8 @@ struct File_d** getDirectory(const char *path) {
     return dirTable;
 }
 
-FILE* getFilePtrFromDir(const char** dir, const unsigned short num){
+FILE* getFilePtrFromDir(const struct File_d** dir, const unsigned short num){
     FILE* ptr = malloc(sizeof(FILE));
-
+    ptr = fopen(dir[num-1]->name, "1");
+    return ptr;
 }

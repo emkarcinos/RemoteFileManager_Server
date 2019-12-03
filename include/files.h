@@ -10,4 +10,4 @@ struct File_d {
 
 struct File_d** getDirectory(const char* path);
 
-FILE* getFilePtrFromDir(const char** dir, unsigned short num);
+FILE* getFilePtrFromDir(const struct File_d** dir, unsigned short num);

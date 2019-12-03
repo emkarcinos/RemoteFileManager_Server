@@ -8,4 +8,4 @@ include_directories(PUBLIC logger/src)
 add_executable(RemoteFileManager_Server include/tcp_sock.h
         src/tcp_sock.c
         src/main.c src/connector.c include/connector.h
-        logger/src/log.c logger/src/log.h src/applet.c include/applet.h src/io.c include/io.h src/files.c include/files.h include/settings.h)
+        logger/src/log.c logger/src/log.h src/applet.c include/applet.h src/io.c include/io.h src/files.c include/files.h include/settings.h include/protocol.h)
