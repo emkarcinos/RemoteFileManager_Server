@@ -38,3 +38,7 @@ FILE* getFilePtrFromDir(const struct File_d** dir, const unsigned int num){
     FILE* ptr = fopen(path, "r");
     return ptr;
 }
+
+char* getFileNameFromDir(const struct File_d** dir, const unsigned int num){
+    return dir[num-1]->name;
+}
