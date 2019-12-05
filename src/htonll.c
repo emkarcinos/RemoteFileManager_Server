@@ -1,5 +1,4 @@
-#include <sys/param.h>
-
+#include "htonll.h"
 uint64_t htonll(uint64_t n)
 {
 #if __BYTE_ORDER == __BIG_ENDIAN
