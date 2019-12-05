@@ -36,9 +36,21 @@ void appLoop(const int sockfd){
     sendString(sockfd, "Type a file number you wish to download:");
     askForInput(sockfd);
     int ans = readInt(sockfd);
-    printf("%d", ans);
     FILE* fp = getFilePtrFromDir((const struct File_d **) directory, ans);
+    char* fileName = getFileNameFromDir((const struct File_d **) directory, ans);
+    char *message = malloc(sizeof(char)*BUF_SIZE);
+    sprintf(message, "Selected file: %s", fileName);
+    sendString(sockfd, message);
+    free(message);
     sendFileSize(sockfd, fp);
+    sendString(sockfd, "Do you want to download this file? [Y/n]");
+    askForInput(sockfd);
+    ans = readInt(sockfd);
+    if(ans == 1) {
+        sendString(sockfd, fileName);
+        sendFile(fp, sockfd);
+    } else
+        sendEndOfService(sockfd);
     sendString(sockfd, "That's all that we can offer right now. Goodbye.");
     sendEndOfService(sockfd);
 }
