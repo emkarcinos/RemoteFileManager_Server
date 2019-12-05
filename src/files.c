@@ -24,8 +24,11 @@ struct File_d** getDirectory(const char *path) {
 }
 
 long getFileSize(FILE* filePtr) {
+    long prev=ftell(filePtr);
     fseek(filePtr, 0L, SEEK_END);
-    return ftell(filePtr);
+    long sz=ftell(filePtr);
+    fseek(filePtr,prev,SEEK_SET);
+    return sz;
 }
 
 FILE* getFilePtrFromDir(const struct File_d** dir, const unsigned int num){
