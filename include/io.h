@@ -5,7 +5,6 @@
 #include "files.h"
 
 
-[[__attribute_deprecated__]];
 char *getMessage(int socket);
 
 int sendMessage(int socket, const char *message);

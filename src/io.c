@@ -4,6 +4,8 @@
 #include <string.h>
 #include <arpa/inet.h>
 #include <stdlib.h>
+#include <sys/stat.h>
+
 #include "io.h"
 #include "log.h"
 #include "protocol.h"
@@ -51,18 +53,10 @@ int sendFile(FILE *filePointer, const int socket) {
             return -1;
         }
         memset(buffer, 0, BUF_SIZE * sizeof(char));
-    }]
+    }
     return 0;
 }
 
-/* deprecated */
-void sendFileSize(const int sockfd, FILE* filePtr){
-    long size = getFileSize(filePtr);
-    long converted = size;
-    char message[8];
-    memcpy(message, &converted, 8);
-    sendMessage(sockfd, message);
-}
 
 char* composePacket(const char type, const int len, const char* message){
     if (len > BUF_SIZE - 5){
@@ -112,4 +106,13 @@ void sendDirectory(const int sockfd, const struct File_d** dirTable){
         sprintf(buffer, "%d: %s", dirTable[i]->id, dirTable[i]->name);
         sendString(sockfd, buffer);
     }
+}
+
+void sendFileSize(int sockfd, FILE* filePtr){
+    long size = getFileSize(filePtr);
+    long sizeEndian = htonl(size);
+    char buffer[8];
+    memcpy(buffer, &sizeEndian, 8);
+    const char* packet = composePacket(T_LL, sizeof(long), buffer);
+    sendPacket(sockfd, packet);
 }
