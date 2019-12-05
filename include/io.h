@@ -13,3 +13,5 @@ int sendFile(FILE *filePointer, int socket);
 void sendDirectory(int sockfd, const struct File_d** dirTable);
 
 void sendFileSize(int sockfd, FILE* filePtr);
+
+char* composePacket(char type, int len, const char* message);

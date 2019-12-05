@@ -3,6 +3,7 @@
 #include <sys/socket.h>
 #include <string.h>
 #include <arpa/inet.h>
+#include <stdlib.h>
 #include "io.h"
 #include "log.h"
 #include "protocol.h"
@@ -23,7 +24,7 @@ int sendMessage(int socket, const char *message) {
     char* temp = getMessage(socket);
     if(strcmp(temp, C_ACK)==0){
         log_info("Sending a message...");
-        int receivedBytes = send(socket, message, 1024, 0);
+        int receivedBytes = send(socket, message, BUF_SIZE, 0);
         if (receivedBytes <= 0)
             log_error("An error has occurred during sending.");
         else
@@ -57,7 +58,7 @@ int sendFile(FILE *filePointer, const int socket) {
 
 void sendFileSize(const int sockfd, FILE* filePtr){
     long size = getFileSize(filePtr);
-    long converted = htonl(size);
+    long converted = size;
     char message[8];
     memcpy(message, &converted, 8);
     sendMessage(sockfd, message);
@@ -71,5 +72,23 @@ void sendDirectory(const int sockfd, const struct File_d** dirTable){
         sprintf(buffer, "%d: %s\n", dirTable[i]->id, dirTable[i]->name);
         sendMessage(sockfd, buffer);
     }
-    sendMessage(sockfd, DIR_DONE "\n");
+    sendMessage(sockfd, DIR_DONE + "\n");
+}
+
+char* composePacket(const char type, const int len, const char* message){
+    if (len > BUF_SIZE - 5){
+        log_error("The packet's size is too large.");
+        return NULL;
+    }
+    char* finalMessage = malloc(sizeof(char)*BUF_SIZE);
+    memset(finalMessage, 0, len + 5);
+    /* First byte is a char */
+    memcpy(finalMessage, &type, 1);
+    /* Next 4 bytes are an integer indicating the length */
+    int converted = htonl(len);
+    memcpy(finalMessage+1, &converted, 4);
+    /* Remaining part of the packet is filled with data */
+    memcpy(finalMessage+5, message, len);
+
+    return finalMessage;
 }
