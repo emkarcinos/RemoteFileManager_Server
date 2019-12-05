@@ -4,16 +4,15 @@
 #include <string.h>
 #include <arpa/inet.h>
 #include <stdlib.h>
-#include <sys/stat.h>
 
 #include "io.h"
 #include "log.h"
 #include "protocol.h"
+#include "htonll.h"
 
-/* deprecated */
 char *getMessage(const int socket) {
     static char msg[BUF_SIZE];
-    memset(msg, '\0', BUF_SIZE * sizeof(char));
+    memset(msg, 0, BUF_SIZE);
     log_info("Waiting for message...");
     if (recv(socket, msg, BUF_SIZE, 0) <= 0) {
         log_warn("Received an empty message");
@@ -23,20 +22,17 @@ char *getMessage(const int socket) {
     return msg;
 }
 
-/* deprecated */
-int sendMessage(int socket, const char *message) {
-    char* temp = getMessage(socket);
-    if(strcmp(temp, C_ACK)==0){
-        log_info("Sending a message...");
-        int receivedBytes = send(socket, message, BUF_SIZE, 0);
-        if (receivedBytes <= 0)
-            log_error("An error has occurred during sending.");
-        else
-            log_info("Message sent.");
-        return receivedBytes;
-    } else {
+int readInt(const int socket) {
+    char msg[4];
+    memset(msg, 0, 4);
+    log_info("Waiting for message...");
+    if (recv(socket, msg, 4, 0) <= 0) {
+        log_warn("Received an empty message");
         return -1;
     }
+    log_info("Message: %s", msg);
+    int result = (msg[3] << 24 | msg[2] << 16 | msg[1] << 8 | msg[0]);
+    return result;
 }
 
 int sendFile(FILE *filePointer, const int socket) {
@@ -57,7 +53,6 @@ int sendFile(FILE *filePointer, const int socket) {
     return 0;
 }
 
-
 char* composePacket(const char type, const int len, const char* message){
     if (len > BUF_SIZE - 5){
         log_error("The packet's size is too large.");
@@ -68,7 +63,7 @@ char* composePacket(const char type, const int len, const char* message){
     /* First byte is a char */
     memcpy(finalMessage, &type, 1);
     /* Next 4 bytes are an integer indicating the length */
-    int converted = htonl(len);
+    unsigned int converted = htonl(len);
     memcpy(finalMessage+1, &converted, 4);
     /* Remaining part of the packet is filled with data */
     memcpy(finalMessage+5, message, len);
@@ -78,9 +73,9 @@ char* composePacket(const char type, const int len, const char* message){
 
 int getPacketSize(const char* packet){
     int lenEndian = 0;
-    memcpy(lenEndian, packet+1, 4);
+    memcpy(&lenEndian, packet+1, 4);
     int result = ntohl(lenEndian);
-    return result;
+    return result + 5;
 }
 
 void sendPacket(int sockfd, const char* packet){
@@ -104,15 +99,26 @@ void sendDirectory(const int sockfd, const struct File_d** dirTable){
     for(int i = 0; dirTable[i] != NULL; i++) {
         memset(buffer, 0, BUF_SIZE);
         sprintf(buffer, "%d: %s", dirTable[i]->id, dirTable[i]->name);
-        sendString(sockfd, buffer);
+        const int len = strlen(buffer);
+        const char* packet = composePacket(T_DIR, len, buffer);
+        sendPacket(sockfd, packet);
+        sendPacket(sockfd, composePacket(DONEFOR, 1, "0"));
     }
 }
 
 void sendFileSize(int sockfd, FILE* filePtr){
     long size = getFileSize(filePtr);
-    long sizeEndian = htonl(size);
+    long sizeEndian = htonll(size);
     char buffer[8];
     memcpy(buffer, &sizeEndian, 8);
     const char* packet = composePacket(T_LL, sizeof(long), buffer);
     sendPacket(sockfd, packet);
+}
+
+void sendEndOfService(int sockfd){
+    sendPacket(sockfd, composePacket(DONEFOR, 1, "0"));
+}
+
+void askForInput(int sockfd){
+    sendPacket(sockfd, composePacket(USRIN, 1, "0"));
 }

@@ -7,7 +7,7 @@
 
 char *getMessage(int socket);
 
-int sendMessage(int socket, const char *message);
+int readInt(int socket);
 
 int sendFile(FILE *filePointer, int socket);
 
@@ -22,4 +22,8 @@ int getPacketSize(const char* packet);
 void sendPacket(int sockfd, const char* packet);
 
 void sendString(int sockfd, const char* message);
+
+void sendEndOfService(int sockfd);
+
+void askForInput(int sockfd);
 
