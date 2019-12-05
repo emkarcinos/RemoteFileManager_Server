@@ -4,11 +4,14 @@
 #include <string.h>
 #include <arpa/inet.h>
 #include <stdlib.h>
+#include <time.h>
 
 #include "io.h"
 #include "log.h"
 #include "protocol.h"
 #include "htonll.h"
+
+struct timespec t = {100 / 1000, 100 * 100000};
 
 int readInt(const int socket) {
     char msg[4];
@@ -24,6 +27,7 @@ int readInt(const int socket) {
 }
 
 int sendFile(FILE *filePointer, const int socket) {
+
     char buffer[BUF_SIZE - 5];
     memset(buffer, 0, BUF_SIZE - 5);
     int readBytes;
@@ -35,6 +39,7 @@ int sendFile(FILE *filePointer, const int socket) {
         char *toSend = composePacket(T_FILE, readBytes, buffer);
         sendPacket(socket, toSend);
         memset(buffer, 0, BUF_SIZE - 5);
+        nanosleep(&t, NULL);
     }
     sendEndOfService(socket);
     return 0;
