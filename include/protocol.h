@@ -27,3 +27,7 @@
 #define T_FILE  '3'
 /* A 64-bit integer */
 #define T_LL    '4'
+/* End of job */
+#define DONEFOR '5'
+/* Ask for user input */
+#define USRIN   '6'
