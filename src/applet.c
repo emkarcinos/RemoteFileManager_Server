@@ -4,12 +4,10 @@
 #include <connector.h>
 #include <unistd.h>
 #include <arpa/inet.h>
-#include <string.h>
 #include <stdlib.h>
 #include "applet.h"
 #include "log.h"
 #include "io.h"
-#include "protocol.h"
 
 void serveConnections(const int sockfd, const int flag) {
     struct sockaddr_in endpointAddr;
@@ -31,29 +29,16 @@ void serveConnections(const int sockfd, const int flag) {
 }
 
 void appLoop(const int sockfd){
-    /* Welcome message */
-    sendMessage(sockfd, "Welcome to the file server. We're here to serve you.\n");
+    sendString(sockfd, "Welcome to the file server. We're here to serve you.");
     struct File_d** directory = getDirectory("/home/marcin/Downloads");
-    int running = 1;
-    while(running){
-        sendMessage(sockfd, "Choose a file from the list to download:\n");
-        sendDirectory(sockfd, (const struct File_d **) directory);
-        char* response = getMessage(sockfd);
-        if (strcmp(response, C_STOP) == 0){
-            sendMessage(sockfd, "Goodbye.");
-            running = 0;
-        } else if (strcmp(response, C_FILE)==0){
-            char* msg = getMessage(sockfd);
-            FILE* filePtr=getFilePtrFromDir((const struct File_d **) directory, atoi(msg));
-            sendFileSize(sockfd, filePtr);
-            response = getMessage(sockfd);
-            if(strcmp(response, C_NO)==0)
-                continue;
-            else if (strcmp(response, C_YES)==0)
-                sendFile(filePtr, sockfd);
-        } else if (strcmp(response, C_DIR)==0) {
-            sendDirectory(sockfd, (const struct File_d **) directory);
-        }
-    }
-    exit(0);
+    sendString(sockfd, "Choose a file from the list to download:");
+    sendDirectory(sockfd, (const struct File_d **) directory);
+    sendString(sockfd, "Type a file number you wish to download:");
+    askForInput(sockfd);
+    int ans = readInt(sockfd);
+    printf("%d", ans);
+    FILE* fp = getFilePtrFromDir((const struct File_d **) directory, ans);
+    sendFileSize(sockfd, fp);
+    sendString(sockfd, "That's all that we can offer right now. Goodbye.");
+    sendEndOfService(sockfd);
 }
