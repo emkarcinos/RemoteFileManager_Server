@@ -21,6 +21,7 @@ char *getMessage(const int socket) {
     return msg;
 }
 
+/* deprecated */
 int sendMessage(int socket, const char *message) {
     char* temp = getMessage(socket);
     if(strcmp(temp, C_ACK)==0){
@@ -37,13 +38,11 @@ int sendMessage(int socket, const char *message) {
 }
 
 int sendFile(FILE *filePointer, const int socket) {
-    sendMessage(socket, FILE_START);
     char buffer[BUF_SIZE];
     memset(buffer, 0, BUF_SIZE * sizeof(char));
     int readBytes;
     while ((readBytes = fread(buffer, sizeof(char), BUF_SIZE, filePointer)) > 0) {
         if (ferror(filePointer)) {
-            sendMessage(socket, FILE_ERR);
             log_error("Error opening the file.");
             return -1;
         }
@@ -52,28 +51,17 @@ int sendFile(FILE *filePointer, const int socket) {
             return -1;
         }
         memset(buffer, 0, BUF_SIZE * sizeof(char));
-    }
-    sendMessage(socket, FILE_DONE);
+    }]
     return 0;
 }
 
+/* deprecated */
 void sendFileSize(const int sockfd, FILE* filePtr){
     long size = getFileSize(filePtr);
     long converted = size;
     char message[8];
     memcpy(message, &converted, 8);
     sendMessage(sockfd, message);
-}
-
-void sendDirectory(const int sockfd, const struct File_d** dirTable){
-    sendMessage(sockfd, DIR_START);
-    char buffer[BUF_SIZE];
-    memset(buffer, 0, BUF_SIZE);
-    for(int i = 0; dirTable[i] != NULL; i++) {
-        sprintf(buffer, "%d: %s\n", dirTable[i]->id, dirTable[i]->name);
-        sendMessage(sockfd, buffer);
-    }
-    sendMessage(sockfd, DIR_DONE + "\n");
 }
 
 char* composePacket(const char type, const int len, const char* message){
@@ -113,6 +101,15 @@ void sendPacket(int sockfd, const char* packet){
 
 void sendString(int sockfd, const char* message){
     const int len = strlen(message);
-    const char* packet = composePacket(STR, len, message);
+    const char* packet = composePacket(T_STR, len, message);
     sendPacket(sockfd, packet);
+}
+
+void sendDirectory(const int sockfd, const struct File_d** dirTable){
+    char buffer[BUF_SIZE];
+    for(int i = 0; dirTable[i] != NULL; i++) {
+        memset(buffer, 0, BUF_SIZE);
+        sprintf(buffer, "%d: %s", dirTable[i]->id, dirTable[i]->name);
+        sendString(sockfd, buffer);
+    }
 }

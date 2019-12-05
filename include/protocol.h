@@ -19,16 +19,11 @@
 
 /* SERVER MESSAGES */
 
-#define STR         '1'
-/* Begin Directory list stream */
-#define DIR_START   '2'
-/* End Directory list stream */
-#define DIR_DONE    '3'
-/* Begin File stream */
-#define FILE_START  '4'
-/* End File stream */
-#define FILE_DONE   '5'
-/* File Error */
-#define FILE_ERR    '6'
-/* Dir Error */
-#define DIR_ERR     '7'
+/* A string */
+#define T_STR   '1'
+/* Directory list stream */
+#define T_DIR   '2'
+/* File stream */
+#define T_FILE  '3'
+/* A 64-bit integer */
+#define T_LL    '4'
