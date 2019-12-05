@@ -4,9 +4,6 @@
 
 #include "files.h"
 
-
-char *getMessage(int socket);
-
 int readInt(int socket);
 
 int sendFile(FILE *filePointer, int socket);

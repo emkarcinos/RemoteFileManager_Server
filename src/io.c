@@ -10,18 +10,6 @@
 #include "protocol.h"
 #include "htonll.h"
 
-char *getMessage(const int socket) {
-    static char msg[BUF_SIZE];
-    memset(msg, 0, BUF_SIZE);
-    log_info("Waiting for message...");
-    if (recv(socket, msg, BUF_SIZE, 0) <= 0) {
-        log_warn("Received an empty message");
-        return "";
-    }
-    log_info("Message: %s", msg);
-    return msg;
-}
-
 int readInt(const int socket) {
     char msg[4];
     memset(msg, 0, 4);
