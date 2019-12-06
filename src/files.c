@@ -14,6 +14,7 @@ struct File_d** getDirectory(const char *path) {
         int num = 0;
         while ((ent = readdir(dir)) != NULL) {
             dirTable[num] = malloc(sizeof(struct File_d));
+            memset(dirTable[num], 0, BUF_SIZE+ sizeof(int));
             dirTable[num]->id=num + 1;
             memcpy(dirTable[num]->name, ent->d_name, strlen(ent->d_name));
             num++;

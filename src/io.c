@@ -4,7 +4,7 @@
 #include <string.h>
 #include <arpa/inet.h>
 #include <stdlib.h>
-#include <time.h>
+#include <unistd.h>
 
 #include "io.h"
 #include "log.h"
@@ -26,6 +26,7 @@ int readInt(const int socket) {
     return result;
 }
 
+/*
 int sendFile(FILE *filePointer, const int socket) {
 
     char buffer[BUF_SIZE - 5];
@@ -42,6 +43,28 @@ int sendFile(FILE *filePointer, const int socket) {
         nanosleep(&t, NULL);
     }
     sendEndOfService(socket);
+    return 0;
+}
+ */
+
+int sendFile(FILE *filePointer, const int socket) {
+    sendPacket(socket, composePacket(T_FILE, 1, "t"));
+    log_info("Sending file...");
+    char buffer[BUF_SIZE];
+    memset(buffer, 0, BUF_SIZE * sizeof(char));
+    int readBytes;
+    while ((readBytes = fread(buffer, sizeof(char), BUF_SIZE, filePointer)) > 0) {
+        if (ferror(filePointer)) {
+            log_error("Error opening the file.");
+            return -1;
+        }
+        if (send(socket, buffer, readBytes, 0) < 0) {
+            log_error("An error has occurred during file sending.");
+            return -1;
+        }
+        memset(buffer, 0, BUF_SIZE * sizeof(char));
+    }
+    sleep(1);
     return 0;
 }
 
